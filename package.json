@@ -1,0 +1,16 @@
+{
+  "name": "aidoku-as",
+  "version": "1.0.0",
+  "author": "Sitty",
+  "license": "GPLv3",
+  "description": "AssemblyScript wrapper for Aidoku sources",
+  "ascMain": "src/index.ts",
+  "devDependencies": {
+    "assemblyscript": "^0.19.23"
+  },
+  "scripts": {
+    "asbuild:untouched": "asc src/index.ts --target debug",
+    "asbuild:optimized": "asc src/index.ts --target release",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+  }
+}
