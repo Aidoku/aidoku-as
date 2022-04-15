@@ -1,6 +1,6 @@
 import { JSON } from './json';
 import { Html } from './html';
-import { HostObject } from './std';
+import { ValueRef } from './std';
 
 export declare function init(method: i32): i32;
 export declare function send(req: i32): void;
@@ -37,7 +37,7 @@ export class Request {
 	}
 
 	get url(): string {
-		let url = new HostObject(get_url(this.req));
+		let url = new ValueRef(get_url(this.req));
 		let string = url.toString();
 		url.close();
 		return string;

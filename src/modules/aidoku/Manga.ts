@@ -1,5 +1,5 @@
 import { create_manga, create_manga_result } from "./aidoku";
-import { HostObject } from "../std";
+import { ValueRef, ArrayRef } from "../std";
 
 export enum MangaStatus {
 	Unknown = 0,
@@ -27,9 +27,9 @@ export class MangaPageResult {
 	constructor(public manga: Manga[], public hasNext: boolean) {}
 
 	get value(): i32 {
-		let mangaArray = HostObject.array();
-		for (let i = 0; i < this.manga.length; i++) mangaArray.push(new HostObject(this.manga[i].value));
-		return create_manga_result(mangaArray.rid, this.hasNext);
+		let mangaArray = ArrayRef.new();
+		for (let i = 0; i < this.manga.length; i++) mangaArray.push(new ValueRef(this.manga[i].value));
+		return create_manga_result(mangaArray.value.rid, this.hasNext);
 	}
 }
 

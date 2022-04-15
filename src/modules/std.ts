@@ -44,28 +44,21 @@ export enum ObjectType {
 	Date = 7
 }
 
-export class HostObject {
-
-	static null(): HostObject {
-		return new HostObject(create_null());
+export class ValueRef {
+	static null(): ValueRef {
+		return new ValueRef(create_null());
 	}
-	static array(): HostObject {
-		return new HostObject(create_array());
+	static string(value: string): ValueRef {
+		return new ValueRef(create_string(String.UTF8.encode(value), String.UTF8.byteLength(value)));
 	}
-	static object(): HostObject {
-		return new HostObject(create_object());
+	static integer(value: i32): ValueRef {
+		return new ValueRef(create_int(value));
 	}
-	static string(value: string): HostObject {
-		return new HostObject(create_string(String.UTF8.encode(value), String.UTF8.byteLength(value)));
+	static float(value: f32): ValueRef {
+		return new ValueRef(create_float(value));
 	}
-	static integer(value: i32): HostObject {
-		return new HostObject(create_int(value));
-	}
-	static float(value: f32): HostObject {
-		return new HostObject(create_float(value));
-	}
-	static bool(value: bool): HostObject {
-		return new HostObject(create_bool(value));
+	static bool(value: bool): ValueRef {
+		return new ValueRef(create_bool(value));
 	}
 
 	constructor(public rid: i32) {}
@@ -74,48 +67,13 @@ export class HostObject {
 		return typeof_std(this.rid);
 	}
 
-	// Object
-	public get(key: string): HostObject {
-		let rid = object_get(this.rid, String.UTF8.encode(key), String.UTF8.byteLength(key));
-		return new HostObject(rid);
+	// Casting
+	public asArray(): ArrayRef {
+		return new ArrayRef(this);
 	}
 
-	public set(key: string, value: HostObject): void {
-		object_set(this.rid, String.UTF8.encode(key), String.UTF8.byteLength(key), value.rid);
-	}
-
-	public remove(key: string): void {
-		object_remove(this.rid, String.UTF8.encode(key), String.UTF8.byteLength(key));
-	}
-
-	public keys(): string[] {
-		let keyStrings: string[] = [];
-		let keys = new HostObject(object_keys(this.rid)).toArray();
-		for (let i = 0; i < keys.length; i++) {
-			keyStrings.push(keys[i].toString());
-		}
-		return keyStrings;
-	}
-
-	public values(): HostObject[] {
-		return new HostObject(object_values(this.rid)).toArray();
-	}
-
-	// Array
-	public getAt(index: number): HostObject {
-		return new HostObject(array_get(this.rid, index as usize));
-	}
-
-	public setAt(index: number, value: HostObject): void {
-		array_set(this.rid, index as usize, value.rid);
-	}
-
-	public removeAt(index: number): void {
-		array_remove(this.rid, index as usize);
-	}
-
-	public push(value: HostObject): void {
-		array_append(this.rid, value.rid);
+	public asObject(): ObjectRef {
+		return new ObjectRef(this);
 	}
 
 	// Conversion
@@ -151,31 +109,88 @@ export class HostObject {
 		return String.UTF8.decode(buff);
 	}
 
-	public toArray(): HostObject[] {
-		let size = array_len(this.rid) as i32;
-		let result: HostObject[] = [];
-		for (let i = 0; i < size; i++) {
-			result.push(this.getAt(i));
-		}
-		return result;
+	public copy(): ValueRef {
+		return new ValueRef(copy(this.rid));
 	}
 
-	public toObject(): Map<string, HostObject> {
+	public close(): void {
+		destroy(this.rid);
+	}
+}
+
+export class ObjectRef {
+	static new(): ObjectRef {
+		return new ValueRef(create_object()).asObject();
+	}
+
+	constructor(public value: ValueRef) {}
+
+	public get(key: string): ValueRef {
+		let rid = object_get(this.value.rid, String.UTF8.encode(key), String.UTF8.byteLength(key));
+		return new ValueRef(rid);
+	}
+
+	public set(key: string, value: ValueRef): void {
+		object_set(this.value.rid, String.UTF8.encode(key), String.UTF8.byteLength(key), value.rid);
+	}
+
+	public remove(key: string): void {
+		object_remove(this.value.rid, String.UTF8.encode(key), String.UTF8.byteLength(key));
+	}
+
+	public keys(): string[] {
+		let keyStrings: string[] = [];
+		let keys = new ValueRef(object_keys(this.value.rid)).asArray().toArray();
+		for (let i = 0; i < keys.length; i++) {
+			keyStrings.push(keys[i].toString());
+		}
+		return keyStrings;
+	}
+
+	public values(): ValueRef[] {
+		return new ValueRef(object_values(this.value.rid)).asArray().toArray();
+	}
+
+	public toMap(): Map<string, ValueRef> {
 		let keys = this.keys();
 		let values = this.values();
-		let result = new Map<string, HostObject>();
+		let result = new Map<string, ValueRef>();
 		for (let i = 0; i < keys.length; i++) {
 			result.set(keys[i].toString(), values[i]);
 		}
 		return result;
 	}
+}
 
-	// Memory
-	public copy(): HostObject {
-		return new HostObject(copy(this.rid));
+export class ArrayRef {
+	static new(): ArrayRef {
+		return new ValueRef(create_array()).asArray();
 	}
 
-	public close(): void {
-		destroy(this.rid);
+	constructor(public value: ValueRef) {}
+
+	public get(index: number): ValueRef {
+		return new ValueRef(array_get(this.value.rid, index as usize));
+	}
+
+	public set(index: number, value: ValueRef): void {
+		array_set(this.value.rid, index as usize, value.rid);
+	}
+
+	public remove(index: number): void {
+		array_remove(this.value.rid, index as usize);
+	}
+
+	public push(value: ValueRef): void {
+		array_append(this.value.rid, value.rid);
+	}
+
+	public toArray(): ValueRef[] {
+		let size = array_len(this.value.rid) as i32;
+		let result: ValueRef[] = [];
+		for (let i = 0; i < size; i++) {
+			result.push(this.get(i));
+		}
+		return result;
 	}
 }

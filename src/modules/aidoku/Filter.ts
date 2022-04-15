@@ -1,4 +1,4 @@
-import { HostObject, object_get } from "../std";
+import { ValueRef, ObjectRef, object_get } from "../std";
 
 export enum FilterType {
 	Base = 0,
@@ -17,12 +17,12 @@ export class Filter {
 	public type: FilterType;
 	public name: string;
 
-	constructor(public object: HostObject) {
+	constructor(public object: ObjectRef) {
 		this.type = object.get("type").toInteger() as i32;
 		this.name = object.get("name").toString();
 	}
 
-	get value(): HostObject {
+	get value(): ValueRef {
 		return this.object.get("value");
 	}
 }

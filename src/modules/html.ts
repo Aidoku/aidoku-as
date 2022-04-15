@@ -1,7 +1,6 @@
-import { HostObject, array_len, array_get } from './std';
+import { ValueRef, array_len, array_get, destroy } from './std';
 
 export declare function parse(string: ArrayBuffer, size: usize): i32;
-export declare function close(rid: i32): void;
 
 export declare function select(rid: i32, selector: ArrayBuffer, selectorLength: usize): i32;
 export declare function attr(rid: i32, selector: ArrayBuffer, selectorLength: usize): i32;
@@ -42,19 +41,19 @@ export class Html {
 	}
 
 	public baseUri(): string {
-		return new HostObject(base_uri(this.rid)).toString();
+		return new ValueRef(base_uri(this.rid)).toString();
 	}
 
 	public body(): string {
-		return new HostObject(body(this.rid)).toString();
+		return new ValueRef(body(this.rid)).toString();
 	}
 
 	public attr(name: string): string {
-		return new HostObject(attr(this.rid, String.UTF8.encode(name), String.UTF8.byteLength(name))).toString();
+		return new ValueRef(attr(this.rid, String.UTF8.encode(name), String.UTF8.byteLength(name))).toString();
 	}
 
 	public text(): string {
-		return new HostObject(text(this.rid)).toString();
+		return new ValueRef(text(this.rid)).toString();
 	}
 
 	public array(): Html[] {
@@ -68,23 +67,23 @@ export class Html {
 	}
 
 	public html(): string {
-		return new HostObject(html(this.rid)).toString();
+		return new ValueRef(html(this.rid)).toString();
 	}
 
 	public outerHtml(): string {
-		return new HostObject(outer_html(this.rid)).toString();
+		return new ValueRef(outer_html(this.rid)).toString();
 	}
 
 	public id(): string {
-		return new HostObject(id(this.rid)).toString();
+		return new ValueRef(id(this.rid)).toString();
 	}
 
 	public tagName(): string {
-		return new HostObject(tag_name(this.rid)).toString();
+		return new ValueRef(tag_name(this.rid)).toString();
 	}
 
 	public className(): string {
-		return new HostObject(class_name(this.rid)).toString();
+		return new ValueRef(class_name(this.rid)).toString();
 	}
 
 	public hasClass(className: string): bool {
@@ -96,6 +95,6 @@ export class Html {
 	}
 
 	public close(): void {
-		close(this.rid);
+		destroy(this.rid);
 	}
 }
