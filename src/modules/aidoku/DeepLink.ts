@@ -20,6 +20,6 @@ export class DeepLink {
      * The rid of the DeepLink object.
      */
     get value(): i32 {
-        return create_deeplink(this.manga.value, this.chapter ? chapter.value : -1);
+        return create_deeplink(this.manga.value, this.chapter ? (this.chapter as Chapter).value : -1);
     }
 }

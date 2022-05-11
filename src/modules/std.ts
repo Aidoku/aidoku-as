@@ -60,6 +60,9 @@ export class ValueRef {
 	static bool(value: bool): ValueRef {
 		return new ValueRef(create_bool(value));
 	}
+	static currentDate(): f64 {
+		return read_date(create_date(-1));
+	}
 
 	constructor(public rid: i32) {}
 

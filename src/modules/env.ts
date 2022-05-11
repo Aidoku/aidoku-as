@@ -1,4 +1,4 @@
-export declare function print(message: ArrayBuffer, length: usize): void;
+declare function print(message: ArrayBuffer, length: usize): void;
 
 export namespace console {
 	export function log(message: string): void {
