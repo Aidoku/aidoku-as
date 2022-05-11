@@ -1,2 +1,2 @@
-# aidoku-rs
+# aidoku-as
 AssemblyScript wrapper for Aidoku sources.

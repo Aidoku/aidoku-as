@@ -27,3 +27,8 @@ export declare function create_page(
 	base64: ArrayBuffer, base64_len: usize,
 	text: ArrayBuffer, text_len: usize
 ): i32;
+
+export declare function create_deeplink(
+	manga: i32,
+	chapter: i32,
+): i32;

@@ -1,10 +1,5 @@
-import { Filter, Listing, MangaPageResult, Manga, Chapter, Page } from "./modules/aidoku";
+import { Filter, Listing, MangaPageResult, Manga, Chapter, Page, DeepLink } from "./modules/aidoku";
 import { Request } from "./modules/net";
-
-interface DeepLink {
-	manga: Manga | null;
-	chapter: Chapter | null;
-}
 
 export abstract class Source {
 	abstract getMangaList(filters: Filter[], page: number): MangaPageResult;
