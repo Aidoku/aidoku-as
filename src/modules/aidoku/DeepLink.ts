@@ -3,7 +3,7 @@ import { Chapter } from "./Chapter";
 import { create_deeplink } from "./aidoku";
 
 /**
- * Directly open mangas from aidoku://:sourceId/:mangaId URLs.
+ * Directly open manga from source website URLs.
  */
 export class DeepLink {
     /**
@@ -11,7 +11,7 @@ export class DeepLink {
      * @param manga The manga of the deep link.
      * @param chapter The chapter of the manga.
      */
-    constructor(public manga: Manga | null, public chapter: Chapter | null) {
+    constructor(public manga: Manga, public chapter: Chapter | null) {
         this.manga = manga;
         this.chapter = chapter;   
     }
@@ -20,8 +20,6 @@ export class DeepLink {
      * The rid of the DeepLink object.
      */
     get value(): i32 {
-        const manga = this.manga ? this.manga.value : null;
-        const chapter = this.chapter ? this.chapter.value : null;
-        return create_deeplink(manga ? manga : -1, chapter ? chapter : -1);
+        return create_deeplink(this.manga.value, this.chapter ? chapter.value : -1);
     }
 }
