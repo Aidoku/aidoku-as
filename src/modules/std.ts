@@ -1,37 +1,38 @@
 export declare function copy(rid: i32): i32;
 export declare function destroy(rid: i32): void;
 
-export declare function create_array(): i32;
-export declare function create_object(): i32;
-export declare function create_null(): i32;
-export declare function create_string(buf: ArrayBuffer, len: usize): i32;
-export declare function create_bool(value: bool): i32;
-export declare function create_float(value: f64): i32;
-export declare function create_int(value: i64): i32;
-export declare function create_date(value: f64): i32;
+declare function create_array(): i32;
+declare function create_object(): i32;
+declare function create_null(): i32;
+declare function create_string(buf: ArrayBuffer, len: usize): i32;
+declare function create_bool(value: bool): i32;
+declare function create_float(value: f64): i32;
+declare function create_int(value: i64): i32;
+declare function create_date(value: f64): i32;
 
+// @ts-ignore: Decorators are valid here.
 @external("std", "typeof")
 export declare function typeof_std(rid: i32): i32;
 export declare function string_len(rid: i32): usize;
-export declare function read_bool(rid: i32): bool;
-export declare function read_int(rid: i32): i64;
-export declare function read_float(rid: i32): f64;
+declare function read_bool(rid: i32): bool;
+declare function read_int(rid: i32): i64;
+declare function read_float(rid: i32): f64;
 export declare function read_string(rid: i32, buf: ArrayBuffer, len: usize): void;
-export declare function read_date(rid: i32): f64;
-export declare function read_date_string(rid: i32, format: ArrayBuffer, formatSize: usize, locale: ArrayBuffer, localeSize: usize, timeZone: ArrayBuffer, timeZoneSize: usize): f64;
+declare function read_date(rid: i32): f64;
+declare function read_date_string(rid: i32, format: ArrayBuffer, formatSize: usize, locale: ArrayBuffer, localeSize: usize, timeZone: ArrayBuffer, timeZoneSize: usize): f64;
 
 export declare function array_len(rid: i32): usize;
 export declare function array_get(rid: i32, idx: usize): i32;
-export declare function array_set(rid: i32, idx: usize, value: i32): void;
-export declare function array_append(rid: i32, value: i32): void;
-export declare function array_remove(rid: i32, idx: usize): void;
+declare function array_set(rid: i32, idx: usize, value: i32): void;
+declare function array_append(rid: i32, value: i32): void;
+declare function array_remove(rid: i32, idx: usize): void;
 
 export declare function object_len(rid: i32): usize;
 export declare function object_get(rid: i32, key: ArrayBuffer, len: usize): i32;
-export declare function object_set(rid: i32, key: ArrayBuffer, len: usize, value: i32): void;
-export declare function object_keys(rid: i32): i32;
-export declare function object_values(rid: i32): i32;
-export declare function object_remove(rid: i32, key: ArrayBuffer, len: usize): void;
+declare function object_set(rid: i32, key: ArrayBuffer, len: usize, value: i32): void;
+declare function object_keys(rid: i32): i32;
+declare function object_values(rid: i32): i32;
+declare function object_remove(rid: i32, key: ArrayBuffer, len: usize): void;
 
 export enum ObjectType {
 	Null = 0,
@@ -41,25 +42,32 @@ export enum ObjectType {
 	Bool = 4,
 	Array = 5,
 	Object = 6,
-	Date = 7
+	Date = 7,
+	Node = 8,
+	Unknown = 9,
 }
 
 export class ValueRef {
 	static null(): ValueRef {
 		return new ValueRef(create_null());
 	}
+
 	static string(value: string): ValueRef {
 		return new ValueRef(create_string(String.UTF8.encode(value), String.UTF8.byteLength(value)));
 	}
+
 	static integer(value: i32): ValueRef {
 		return new ValueRef(create_int(value));
 	}
+
 	static float(value: f32): ValueRef {
 		return new ValueRef(create_float(value));
 	}
+
 	static bool(value: bool): ValueRef {
 		return new ValueRef(create_bool(value));
 	}
+
 	static currentDate(): f64 {
 		return read_date(create_date(-1));
 	}
@@ -92,15 +100,23 @@ export class ValueRef {
 		return read_bool(this.rid);
 	}
 
-	public toDate(format: string, locale: string | null = null, timeZone: string | null = null): f64 {
+	/**
+	 * Converts a textual representation of a date to a Unix timestamp.
+	 * @param format The date format, as understood by {@link https://nsdateformatter.com| NSDateFormatter}
+	 * @param locale The locale identifier as understood by {@link https://nsdateformatter.com| NSDateFormatter}
+	 * @param timeZone A {@link https://en.wikipedia.org/wiki/List_of_tz_database_time_zones| tz database timezone} or a
+	 * {@link https://gist.github.com/mteece/80fff3329074cf90d7991e55f4fc8de4| timezone abbreviation}
+	 * @returns the date as a Unix timestamp.
+	 */
+	public toDate(format: string, locale?: string, timeZone?: string): f64 {
 		return read_date_string(
 			this.rid,
 			String.UTF8.encode(format),
 			String.UTF8.byteLength(format),
-			locale != null ? String.UTF8.encode(locale as string) : new ArrayBuffer(0),
-			locale != null ? String.UTF8.byteLength(locale as string) as usize : 0,
-			timeZone != null ? String.UTF8.encode(timeZone as string) : new ArrayBuffer(0),
-			timeZone != null ? String.UTF8.byteLength(timeZone as string) as usize : 0
+			locale ? String.UTF8.encode(locale as string) : new ArrayBuffer(0),
+			locale ? String.UTF8.byteLength(locale as string) as usize : 0,
+			timeZone ? String.UTF8.encode(timeZone as string) : new ArrayBuffer(0),
+			timeZone ? String.UTF8.byteLength(timeZone as string) as usize : 0
 		);
 	}
 

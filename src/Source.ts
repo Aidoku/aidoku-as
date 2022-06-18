@@ -2,6 +2,8 @@ import { Filter, Listing, MangaPageResult, Manga, Chapter, Page, DeepLink } from
 import { Request } from "./modules/net";
 
 export abstract class Source {
+	initialize(): void {};
+
 	abstract getMangaList(filters: Filter[], page: number): MangaPageResult;
 
 	getMangaListing(listing: Listing, page: number): MangaPageResult {
@@ -19,4 +21,6 @@ export abstract class Source {
 	handleUrl(url: string): DeepLink | null {
 		return null;
 	}
+
+	handleNotification(notification: string): void {};
 }

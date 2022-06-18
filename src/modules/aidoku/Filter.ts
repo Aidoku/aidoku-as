@@ -1,4 +1,4 @@
-import { ValueRef, ObjectRef, object_get } from "../std";
+import { ValueRef, ObjectRef } from "../std";
 
 export enum FilterType {
 	Base = 0,
