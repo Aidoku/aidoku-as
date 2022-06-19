@@ -8,6 +8,11 @@ declare function parse_fragment_with_uri(html: ArrayBuffer, htmlLen: usize, base
 declare function select(rid: i32, selector: ArrayBuffer, selectorLength: usize): i32;
 declare function attr(rid: i32, selector: ArrayBuffer, selectorLength: usize): i32;
 
+declare function set_text(rid: i32, text: ArrayBuffer, length: usize): i32;
+declare function set_html(rid: i32, html: ArrayBuffer, length: usize): i32;
+declare function prepend(rid: i32, html: ArrayBuffer, length: usize): i32;
+declare function append(rid: i32, html: ArrayBuffer, length: usize): i32;
+
 declare function first(rid: i32): i32;
 declare function last(rid: i32): i32;
 declare function next(rid: i32): i32;
@@ -233,8 +238,15 @@ export class Html {
 	 * {@link data|data()} to retrieve that content.
 	 * @returns normalized text, or an empty string.
 	 */
-	public text(): string {
+	get text(): string {
 		return new ValueRef(text(this.rid)).toString();
+	}
+
+	/**
+	 * Set the element's text content, clearing any existing content.
+	 */
+	set text(text: string) {
+		set_text(this.rid, String.UTF8.encode(text), String.UTF8.byteLength(text));
 	}
 
 	/**
@@ -277,8 +289,33 @@ export class Html {
 	 * Retrieves the element's inner HTML.
 	 * @returns string of HTML
 	 */
-	public html(): string {
+	get html(): string {
 		return new ValueRef(html(this.rid)).toString();
+	}
+
+	/**
+	 * Set the element's inner HTML, clearning the existing HTML.
+	 */
+	set html(html: string) {
+		set_html(this.rid, String.UTF8.encode(html), String.UTF8.byteLength(html));
+	}
+
+	/**
+	 * Add inner HTML into this element. The given HTML will be parsed, and
+	 * each node prepended to the start of the element's children.
+	 * @param html the HTML to prepend
+	 */
+	public prepend(html: string) {
+		prepend(this.rid, String.UTF8.encode(html), String.UTF8.byteLength(html));
+	}
+
+	/**
+	 * Add inner HTML into this element. The given HTML will be parsed, and
+	 * each node appended to the end of the element's children.
+	 * @param html the HTML to append
+	 */
+	public append(html: string) {
+		append(this.rid, String.UTF8.encode(html), String.UTF8.byteLength(html));
 	}
 
 	/**
