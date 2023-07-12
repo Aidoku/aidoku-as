@@ -1,7 +1,7 @@
-import { object_get, read_string, string_len } from "../std"
+import { object_get, read_string, string_len } from "../std";
 
 export class Listing {
-	public name: string;
+	public name: string = "";
 
 	constructor(public rid: i32) {
 		let textRid = object_get(this.rid, String.UTF8.encode("name"), 4);

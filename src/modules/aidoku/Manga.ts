@@ -62,7 +62,7 @@ export class Manga {
 
 	get value(): i32 {
 		let categories: ArrayBuffer[] = this.categories.map<ArrayBuffer>((c: string): ArrayBuffer => String.UTF8.encode(c, false));
-		let category_str_lens: i32[] = this.categories.map<i32>((c: string): i32 => c.length);
+		let category_str_lens: i32[] = this.categories.map<i32>((c: string): i32 => String.UTF8.byteLength(c));
 
 		return create_manga(
 			String.UTF8.encode(this.id),
